@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau de bord - Administrateur</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Tableau de bord administrateur</h1>
+      <div class="session-timer">
+        Temps restant: <span id="timer"><%= Math.floor(timeLeft / 60) %>:<%= (timeLeft % 60).toString().padStart(2, '0') %></span>
+      </div>
+      <a href="/logout" class="btn btn-danger">Déconnexion</a>
+    </div>
+    
+    <div class="content">
+      <h2>Gestion des utilisateurs</h2>
+      
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Nom d'utilisateur</th>
+            <th>Adresse IP</th>
+            <th>Dernière connexion</th>
+            <th>Expiration session</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.forEach(user => { %>
+            <tr>
+              <td><%= user.username %></td>
+              <td><%= user.ipAddress || 'N/A' %></td>
+              <td><%= user.lastLogin ? user.lastLogin.toLocaleString() : 'N/A' %></td>
+              <td><%= user.sessionExpiry ? user.sessionExpiry.toLocaleString() : 'N/A' %></td>
+              <td><%= user.blacklisted ? 'Blacklisté' : 'Actif' %></td>
+              <td class="actions">
+                <form action="/admin/delete-user/<%= user._id %>" method="POST" class="inline-form">
+                  <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')">Supprimer</button>
+                </form>
+                
+                <form action="/admin/blacklist/<%= user._id %>" method="POST" class="inline-form">
+                  <button type="submit" class="btn btn-sm <%= user.blacklisted ? 'btn-success' : 'btn-warning' %>">
+                    <%= user.blacklisted ? 'Débloquer' : 'Blacklister' %>
+                  </button>
+                </form>
+                
+                <% if (user.sessionExpiry) { %>
+                  <form action="/admin/reduce-time/<%= user._id %>" method="POST" class="inline-form">
+                    <input type="number" name="minutes" min="1" max="60" value="10" style="width: 50px;">
+                    <button type="submit" class="btn btn-sm btn-info">Réduire (min)</button>
+                  </form>
+                <% } %>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <script>
+    // Timer pour le temps de session restant
+    let timeLeft = <%= timeLeft %>;
+    const timerElement = document.getElementById('timer');
+    
+    const updateTimer = () => {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      
+      if (timeLeft <= 0) {
+        window.location.href = '/logout';
+      } else {
+        timeLeft--;
+        setTimeout(updateTimer, 1000);
+      }
+    };
+    
+    updateTimer();
+  </script>
+</body>
+</html>
