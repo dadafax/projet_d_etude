@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const Comment = require('../models/Comment');
+const Notification = require('../models/Notification');
 
 router.get('/dashboard', async (req, res) => {
   try {
@@ -15,11 +16,17 @@ router.get('/dashboard', async (req, res) => {
     
     // Récupérer tous les commentaires
     const comments = await Comment.find().populate('author', 'username').sort({ createdAt: -1 });
+
+    // Récupérer les notifications non lues
+    const notifications = await Notification.find().sort({ date: -1 });
     
     res.render('adminDashboard', { 
       user: req.session.user,
       users,
-      comments
+      comments,
+      notifications,
+      error: req.query.error || null,
+      success: req.query.success || null
     });
   } catch (err) {
     console.error(err);
@@ -29,7 +36,14 @@ router.get('/dashboard', async (req, res) => {
 
 router.post('/delete-user/:id', async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.params.id);
+    const user = await User.findByIdAndDelete(req.params.id);
+
+    // Ajouter une notification pour l'admin
+    const notif = new Notification({
+      message: `L'utilisateur ${user.username} a été supprimé.`,
+    });
+    await notif.save();
+
     res.redirect('/admin/dashboard');
   } catch (err) {
     console.error(err);
@@ -42,6 +56,12 @@ router.post('/blacklist/:id', async (req, res) => {
     const user = await User.findById(req.params.id);
     user.blacklisted = !user.blacklisted;
     await user.save();
+
+    // Ajouter une notification pour l'admin
+    const notif = new Notification({
+      message: `L'utilisateur ${user.username} a été ${user.blacklisted ? 'blacklisté' : 'déblacklisté'}.`,
+    });
+    await notif.save();
 
     // Si l'utilisateur est blacklisté, on le déconnecte
     if (user.blacklisted) {
@@ -84,47 +104,58 @@ router.post('/reduce-time/:id', async (req, res) => {
     const user = await User.findById(req.params.id);
     
     if (user.sessionExpiry) {
-      // Convertir le nombre de minutes en millisecondes
       const reductionMs = parseInt(minutes) * 60 * 1000;
-      
-      // Récupérer l'heure courante
-      const now = new Date();
-      
-      // Récupérer l'heure d'expiration actuelle
       const currentExpiry = new Date(user.sessionExpiry);
-      
-      // Calculer le temps réellement restant
-      const timeLeftMs = Math.max(0, currentExpiry - now);
-      
-      // Soustraire le temps à réduire du temps restant
-      const newTimeLeftMs = Math.max(0, timeLeftMs - reductionMs);
-      
-      // Calculer la nouvelle date d'expiration à partir du temps restant
-      const newExpiry = new Date(now.getTime() + newTimeLeftMs);
-      
-      // Mettre à jour la date d'expiration
+      const newExpiry = new Date(currentExpiry.getTime() - reductionMs);
       user.sessionExpiry = newExpiry;
-      
-      // Sauvegarder dans la base de données
       await user.save();
 
-      // S'assurer que global.activeUsers est initialisé
-      if (!global.activeUsers) {
-        global.activeUsers = {};
-      }
-      
-      // Mettre à jour l'expiration dans global.activeUsers
-      global.activeUsers[user._id.toString()] = {
-        sessionExpiry: newExpiry.getTime()
-      };
-      
-      console.log(`Temps de session réduit de ${minutes} minutes pour l'utilisateur ${user.username}. Temps restant: ${Math.floor(newTimeLeftMs / 60000)} minutes`);
+      global.activeUsers[user._id.toString()] = { sessionExpiry: newExpiry.getTime() };
+
+      // Ajouter une notification pour la réduction de temps
+      const notif = new Notification({
+        message: `Le temps de session de ${user.username} a été réduit de ${minutes} minutes.`,
+      });
+      await notif.save();
+
+      console.log(`Temps de session réduit de ${minutes} minutes pour l'utilisateur ${user.username}. Temps restant: ${Math.floor(newExpiry.getTime() / 60000)} minutes`);
     }
     
     res.redirect('/admin/dashboard');
   } catch (err) {
     console.error("Erreur lors de la réduction du temps:", err);
     res.redirect('/admin/dashboard?error=reduce');
+  }
+});
+
+router.post('/mark-as-read/:id', async (req, res) => {
+  try {
+    const notification = await Notification.findById(req.params.id);
+    if (notification) {
+      notification.isRead = true;
+      await notification.save();
+    }
+    res.redirect('/admin/dashboard');
+  } catch (err) {
+    console.error('Erreur lors du marquage de la notification:', err);
+    res.redirect('/admin/dashboard?error=notification');
+  }
+});
+
+router.post('/delete-notification/:id', async (req, res) => {
+  try {
+    const notification = await Notification.findById(req.params.id);
+    
+    if (!notification) {
+      console.error('Notification non trouvée');
+      return res.redirect('/admin/dashboard?error=notification-not-found');
+    }
+
+    await notification.deleteOne();
+    res.redirect('/admin/dashboard?success=notification-deleted');
+  } catch (err) {
+    console.error('Erreur lors de la suppression de la notification:', err);
+    res.redirect('/admin/dashboard?error=delete-notification');
   }
 });
 

@@ -17,6 +17,53 @@
     
     <div class="content">
       <div class="dashboard-grid">
+        <!-- Section Notifications -->
+        <div class="dashboard-section">
+          <h2><i class="fas fa-bell"></i> Notifications</h2>
+          
+          <% if (typeof error !== 'undefined' && error === 'notification-not-found') { %>
+            <div class="alert alert-danger">
+              <i class="fas fa-exclamation-circle"></i> La notification n'a pas été trouvée.
+            </div>
+          <% } else if (typeof error !== 'undefined' && error === 'delete-notification') { %>
+            <div class="alert alert-danger">
+              <i class="fas fa-exclamation-circle"></i> Une erreur est survenue lors de la suppression de la notification.
+            </div>
+          <% } else if (typeof success !== 'undefined' && success === 'notification-deleted') { %>
+            <div class="alert alert-success">
+              <i class="fas fa-check-circle"></i> La notification a été supprimée avec succès.
+            </div>
+          <% } %>
+
+          <div class="notifications-container">
+            <% if (notifications.length === 0) { %>
+              <p>Aucune notification.</p>
+            <% } else { %>
+              <ul class="notifications-list">
+                <% notifications.forEach(notification => { %>
+                  <li class="<%= notification.isRead ? 'read' : 'unread' %>">
+                    <div class="notification-content">
+                      <%= notification.message %> - <small><%= notification.date.toLocaleString() %></small>
+                    </div>
+                    <div class="notification-actions">
+                      <form action="/admin/mark-as-read/<%= notification._id %>" method="POST" class="inline-form">
+                        <button type="submit" class="btn btn-sm btn-secondary">
+                          <i class="fas fa-check"></i> Marquer comme lu
+                        </button>
+                      </form>
+                      <form action="/admin/delete-notification/<%= notification._id %>" method="POST" class="inline-form">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette notification ?')">
+                          <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                      </form>
+                    </div>
+                  </li>
+                <% }); %>
+              </ul>
+            <% } %>
+          </div>
+        </div>
+
         <!-- Section Gestion des utilisateurs -->
         <div class="dashboard-section">
           <h2><i class="fas fa-users-cog"></i> Gestion des utilisateurs</h2>
@@ -49,13 +96,13 @@
                     </td>
                     <td class="actions">
                       <form action="/admin/delete-user/<%= user._id %>" method="POST" class="inline-form">
-                        <button type="submit" class="action-btn delete" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')">
                           <i class="fas fa-trash-alt"></i> Supprimer
                         </button>
                       </form>
                       
                       <form action="/admin/blacklist/<%= user._id %>" method="POST" class="inline-form">
-                        <button type="submit" class="action-btn <%= user.blacklisted ? 'unblacklist' : 'blacklist' %>">
+                        <button type="submit" class="btn btn-sm <%= user.blacklisted ? 'btn-success' : 'btn-warning' %>">
                           <% if (user.blacklisted) { %>
                             <i class="fas fa-unlock"></i> Débloquer
                           <% } else { %>
@@ -68,7 +115,7 @@
                         <form action="/admin/reduce-time/<%= user._id %>" method="POST" class="inline-form">
                           <div class="time-reduce-group">
                             <input type="number" name="minutes" min="1" max="60" value="10">
-                            <button type="submit" class="action-btn reduce">
+                            <button type="submit" class="btn btn-sm btn-info">
                               <i class="fas fa-clock"></i> Réduire
                             </button>
                           </div>
