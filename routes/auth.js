@@ -1,4 +1,3 @@
-
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
@@ -31,8 +30,8 @@ router.post('/login', async (req, res) => {
       return res.redirect('/?error=Identifiants incorrects');
     }
 
-    // Définir l'expiration de la session (1 heure = 3600 secondes = 3600000 ms)
-    const expiryTime = Date.now() + (60 * 60 * 1000); // 1 heure en millisecondes
+    // Définir l'expiration de la session uniquement pour les utilisateurs non-admin
+    const expiryTime = user.isAdmin ? null : Date.now() + (60 * 60 * 1000); // 1 heure en millisecondes
 
     // Stocker les informations utilisateur dans la session
     req.session.user = {
@@ -40,7 +39,6 @@ router.post('/login', async (req, res) => {
       id: user._id,
       username: user.username,
       isAdmin: user.isAdmin,
-      sessionExpiry: expiryTime, // Correctement défini ici
       blacklisted: user.blacklisted
     };
 

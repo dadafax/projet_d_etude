@@ -28,38 +28,6 @@
         </div>
         <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Publier</button>
       </form>
-      
-      <div class="comments-section">
-        <h3><i class="fas fa-list-alt"></i> Commentaires récents</h3>
-        
-        <% if (comments.length === 0) { %>
-          <div class="empty-state">
-            <i class="fas fa-comment-slash empty-icon"></i>
-            <p>Aucun commentaire pour le moment.</p>
-          </div>
-        <% } else { %>
-          <ul class="comments-list">
-            <% comments.forEach(comment => { %>
-              <li>
-                <div class="comment-header">
-                  <div class="comment-username">
-                    <i class="fas fa-user"></i>
-                    <% if (comment.author && comment.author.username) { %>
-                      <%= comment.author.username %>
-                    <% } else { %>
-                      Anonyme
-                    <% } %>
-                  </div>
-                  <span class="date"><i class="fas fa-calendar"></i> <%= comment.createdAt.toLocaleString() %></span>
-                </div>
-                <div class="comment-content">
-                  <%= comment.content %>
-                </div>
-              </li>
-            <% }); %>
-          </ul>
-        <% } %>
-      </div>
     </div>
   </div>
   

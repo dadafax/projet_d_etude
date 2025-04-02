@@ -12,9 +12,6 @@
   <div class="container">
     <div class="header">
       <h1><i class="fas fa-user-shield"></i> Tableau de bord administrateur</h1>
-      <div class="session-timer">
-        <i class="fas fa-clock"></i> Temps restant: <span id="timer"><%= Math.floor(timeLeft / 60) %>:<%= (timeLeft % 60).toString().padStart(2, '0') %></span>
-      </div>
       <a href="/logout" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
     </div>
     
@@ -80,28 +77,39 @@
           </tbody>
         </table>
       </div>
+
+      <h2><i class="fas fa-comments"></i> Commentaires des utilisateurs</h2>
+      
+      <div class="comments-section">
+        <% if (comments && comments.length === 0) { %>
+          <div class="empty-state">
+            <i class="fas fa-comment-slash empty-icon"></i>
+            <p>Aucun commentaire pour le moment.</p>
+          </div>
+        <% } else { %>
+          <ul class="comments-list">
+            <% comments.forEach(comment => { %>
+              <li>
+                <div class="comment-header">
+                  <div class="comment-username">
+                    <i class="fas fa-user"></i>
+                    <% if (comment.author && comment.author.username) { %>
+                      <%= comment.author.username %>
+                    <% } else { %>
+                      Anonyme
+                    <% } %>
+                  </div>
+                  <span class="date"><i class="fas fa-calendar"></i> <%= comment.createdAt.toLocaleString() %></span>
+                </div>
+                <div class="comment-content">
+                  <%= comment.content %>
+                </div>
+              </li>
+            <% }); %>
+          </ul>
+        <% } %>
+      </div>
     </div>
   </div>
-  
-  <script>
-    // Timer pour le temps de session restant
-    let timeLeft = <%= timeLeft %>;
-    const timerElement = document.getElementById('timer');
-    
-    const updateTimer = () => {
-      const minutes = Math.floor(timeLeft / 60);
-      const seconds = timeLeft % 60;
-      timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-      
-      if (timeLeft <= 0) {
-        window.location.href = '/logout';
-      } else {
-        timeLeft--;
-        setTimeout(updateTimer, 1000);
-      }
-    };
-    
-    updateTimer();
-  </script>
 </body>
 </html>

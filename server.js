@@ -1,4 +1,3 @@
-
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
@@ -13,10 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Connexion à MongoDB
-mongoose.connect('mongodb://localhost:27017/loginApp', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+mongoose.connect('mongodb://localhost:27017/loginApp')
 .then(() => console.log('Connecté à MongoDB'))
 .catch(err => console.error('Erreur de connexion MongoDB:', err));
 

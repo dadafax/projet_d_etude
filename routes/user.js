@@ -1,7 +1,7 @@
-
 const express = require('express');
 const router = express.Router();
 const Comment = require('../models/Comment');
+const User = require('../models/User');
 
 router.post('/comment', async (req, res) => {
   try {
@@ -28,26 +28,35 @@ router.post('/comment', async (req, res) => {
 router.get('/dashboard', async (req, res) => {
   try {
     const userId = req.session.user.id.toString();
+    
+    // Vérifier si l'utilisateur est blacklisté
+    const user = await User.findById(userId);
+    if (user && user.blacklisted) {
+      // Supprimer l'utilisateur de global.activeUsers
+      if (global.activeUsers && global.activeUsers[userId]) {
+        delete global.activeUsers[userId];
+      }
+      req.session.destroy((err) => {
+        if (err) {
+          console.error('Erreur lors de la destruction de la session:', err);
+        }
+        return res.redirect('/?blacklisted=true');
+      });
+      return;
+    }
+    
+    // Vérifier et mettre à jour la session si nécessaire
     if (global.activeUsers && global.activeUsers[userId]) {
       const storedExpiry = global.activeUsers[userId].sessionExpiry;
       if (storedExpiry && storedExpiry !== req.session.user.sessionExpiry) {
         req.session.user.sessionExpiry = storedExpiry;
-        // Forcer la sauvegarde de la session
         req.session.save();
       }
     }
-    // Vérifier si la session a été mise à jour par l'admin
-    if (global.activeUsers && global.activeUsers[req.session.user.id]) {
-      const storedExpiry = global.activeUsers[req.session.user.id].sessionExpiry;
-      if (storedExpiry && storedExpiry !== req.session.user.sessionExpiry) {
-        req.session.user.sessionExpiry = storedExpiry;
-      }
-    }
     
-    // Calculer le temps restant correctement
+    // Calculer le temps restant à partir de la session actuelle
     const now = new Date();
     const expiry = new Date(req.session.user.sessionExpiry);
-    const timeLeftMs = Math.max(0, expiry - now);
     const timeLeft = Math.max(0, Math.floor((expiry - now) / 1000)); // en secondes
     
     // Récupérer les commentaires
