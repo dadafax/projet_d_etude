@@ -52,17 +52,38 @@ router.post('/reduce-time/:id', async (req, res) => {
     const user = await User.findById(req.params.id);
     
     if (user.sessionExpiry) {
+      // Convertir le nombre de minutes en millisecondes
+      const reductionMs = parseInt(minutes) * 60 * 1000;
+      
+      // Récupérer l'heure d'expiration actuelle
       const currentExpiry = new Date(user.sessionExpiry);
-      currentExpiry.setMinutes(currentExpiry.getMinutes() - parseInt(minutes));
-      user.sessionExpiry = currentExpiry;
+      
+      // Calculer la nouvelle date d'expiration
+      const newExpiry = new Date(currentExpiry.getTime() - reductionMs);
+      
+      // Mettre à jour la date d'expiration
+      user.sessionExpiry = newExpiry;
+      
+      // Sauvegarder dans la base de données
       await user.save();
+
+      // S'assurer que global.activeUsers est initialisé
+      if (!global.activeUsers) {
+        global.activeUsers = {};
+      }
+      
+      // Mettre à jour l'expiration dans global.activeUsers
+      global.activeUsers[user._id.toString()] = {
+        sessionExpiry: newExpiry.getTime()
+      };
+      
+      console.log(`Temps de session réduit de ${minutes} minutes pour l'utilisateur ${user.username}`);
     }
     
     res.redirect('/admin/dashboard');
   } catch (err) {
-    console.error(err);
+    console.error("Erreur lors de la réduction du temps:", err);
     res.redirect('/admin/dashboard?error=reduce');
   }
 });
-
 module.exports = router;

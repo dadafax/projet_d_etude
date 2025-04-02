@@ -20,6 +20,9 @@ mongoose.connect('mongodb://localhost:27017/loginApp', {
 .then(() => console.log('Connecté à MongoDB'))
 .catch(err => console.error('Erreur de connexion MongoDB:', err));
 
+// Dans server.js, après avoir configuré mongoose et avant d'initialiser les routes
+global.activeUsers = {};
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

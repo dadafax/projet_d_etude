@@ -16,40 +16,40 @@ router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ username });
-    
+
     if (!user) {
       return res.redirect('/?error=Identifiants incorrects');
     }
-    
+
     if (user.blacklisted) {
       return res.redirect('/?blacklisted=true');
     }
-    
+
     const isMatch = await bcrypt.compare(password, user.password);
-    
+
     if (!isMatch) {
       return res.redirect('/?error=Identifiants incorrects');
     }
-    
-    // Définir l'expiration de la session (1 heure par défaut)
-    const expiryTime = new Date();
-    expiryTime.setHours(expiryTime.getHours() + 1);
-    
+
+    // Définir l'expiration de la session (1 heure = 3600 secondes = 3600000 ms)
+    const expiryTime = Date.now() + (60 * 60 * 1000); // 1 heure en millisecondes
+
+    // Stocker les informations utilisateur dans la session
+    req.session.user = {
+      sessionExpiry: expiryTime,
+      id: user._id,
+      username: user.username,
+      isAdmin: user.isAdmin,
+      sessionExpiry: expiryTime, // Correctement défini ici
+      blacklisted: user.blacklisted
+    };
+
     // Mettre à jour les informations de connexion
     user.ipAddress = req.ip;
     user.lastLogin = new Date();
     user.sessionExpiry = expiryTime;
     await user.save();
-    
-    // Stocker les informations utilisateur dans la session
-    req.session.user = {
-      id: user._id,
-      username: user.username,
-      isAdmin: user.isAdmin,
-      sessionExpiry: expiryTime,
-      blacklisted: user.blacklisted
-    };
-    
+
     if (user.isAdmin) {
       return res.redirect('/admin/dashboard');
     } else {
@@ -60,6 +60,7 @@ router.post('/login', async (req, res) => {
     res.redirect('/?error=Erreur serveur');
   }
 });
+
 
 router.get('/register', (req, res) => {
   res.render('register', { error: '' });

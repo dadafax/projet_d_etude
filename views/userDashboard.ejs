@@ -1,45 +1,56 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tableau de bord - Utilisateur</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>Bienvenue, <%= user.username %></h1>
+      <h1><i class="fas fa-user-circle"></i> Bienvenue, <%= user.username %></h1>
       <div class="session-timer">
-        Temps restant: <span id="timer"><%= Math.floor(timeLeft / 60) %>:<%= (timeLeft % 60).toString().padStart(2, '0') %></span>
+        <i class="fas fa-clock"></i> Temps restant: <span id="timer"><%= Math.floor(timeLeft / 60) %>:<%= (timeLeft % 60).toString().padStart(2, '0') %></span>
       </div>
-      <a href="/logout" class="btn btn-danger">Déconnexion</a>
+      <a href="/logout" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
     </div>
     
     <div class="content">
-      <h2>Système de commentaires</h2>
+      <h2><i class="fas fa-comments"></i> Système de commentaires</h2>
       
       <form action="/user/comment" method="POST" class="comment-form">
         <div class="form-group">
           <label for="content">Nouveau commentaire</label>
-          <textarea id="content" name="content" required></textarea>
+          <textarea id="content" name="content" required placeholder="Partagez vos pensées..."></textarea>
         </div>
-        <button type="submit" class="btn btn-primary">Ajouter</button>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Publier</button>
       </form>
       
       <div class="comments-section">
-        <h3>Commentaires récents</h3>
+        <h3><i class="fas fa-list-alt"></i> Commentaires récents</h3>
         
         <% if (comments.length === 0) { %>
-          <p>Aucun commentaire pour le moment.</p>
+          <div class="empty-state">
+            <i class="fas fa-comment-slash empty-icon"></i>
+            <p>Aucun commentaire pour le moment.</p>
+          </div>
         <% } else { %>
           <ul class="comments-list">
             <% comments.forEach(comment => { %>
               <li>
                 <div class="comment-header">
-                  <strong><%= comment.author.username %></strong>
-                  <span class="date"><%= comment.createdAt.toLocaleString() %></span>
+                  <div class="comment-username">
+                    <i class="fas fa-user"></i>
+                    <% if (comment.author && comment.author.username) { %>
+                      <%= comment.author.username %>
+                    <% } else { %>
+                      Anonyme
+                    <% } %>
+                  </div>
+                  <span class="date"><i class="fas fa-calendar"></i> <%= comment.createdAt.toLocaleString() %></span>
                 </div>
                 <div class="comment-content">
                   <%= comment.content %>

@@ -1,21 +1,21 @@
-
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-  font-family: Arial, sans-serif;
   line-height: 1.6;
-  background-color: #f4f4f4;
+  background-color: #f8f9fa;
   color: #333;
+  min-height: 100vh;
 }
 
 .container {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 25px;
 }
 
 .header {
@@ -23,105 +23,159 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #ccc;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e9ecef;
 }
 
-h1, h2, h3 {
-  margin-bottom: 15px;
+h1 {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+h2, h3 {
+  color: #3a4d61;
+  margin-bottom: 20px;
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #495057;
 }
 
 input, textarea {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: #4dabf7;
+  box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.25);
 }
 
 textarea {
-  height: 100px;
+  height: 120px;
+  resize: vertical;
 }
 
 .btn {
   display: inline-block;
-  padding: 8px 16px;
+  padding: 10px 18px;
   border: none;
-  border-radius: 4px;
-  background-color: #333;
+  border-radius: 6px;
+  background-color: #3b82f6;
   color: #fff;
   cursor: pointer;
   text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn:hover {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
 }
 
 .btn-primary {
-  background-color: #007bff;
+  background-color: #3b82f6;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb;
 }
 
 .btn-danger {
-  background-color: #dc3545;
+  background-color: #ef4444;
+}
+
+.btn-danger:hover {
+  background-color: #dc2626;
 }
 
 .btn-warning {
-  background-color: #ffc107;
-  color: #333;
+  background-color: #f59e0b;
+  color: #fff;
+}
+
+.btn-warning:hover {
+  background-color: #d97706;
 }
 
 .btn-success {
-  background-color: #28a745;
+  background-color: #10b981;
+}
+
+.btn-success:hover {
+  background-color: #059669;
 }
 
 .btn-info {
-  background-color: #17a2b8;
+  background-color: #06b6d4;
+}
+
+.btn-info:hover {
+  background-color: #0891b2;
 }
 
 .btn-sm {
-  padding: 4px 8px;
-  font-size: 0.9em;
+  padding: 6px 12px;
+  font-size: 0.875rem;
 }
 
 .alert {
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  border-left: 4px solid transparent;
 }
 
 .alert-danger {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border-left-color: #ef4444;
 }
 
 .alert-warning {
-  background-color: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffeeba;
+  background-color: #fef3c7;
+  color: #92400e;
+  border-left-color: #f59e0b;
 }
 
 .session-timer {
-  padding: 5px 10px;
-  background-color: #f8f9fa;
-  border-radius: 4px;
+  padding: 8px 15px;
+  background-color: #e9ecef;
+  border-radius: 50px;
   font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  color: #2c3e50;
 }
 
 .content {
   background-color: #fff;
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .comment-form {
-  margin-bottom: 30px;
+  margin-bottom: 35px;
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
 }
 
 .comments-list {
@@ -129,8 +183,13 @@ textarea {
 }
 
 .comments-list li {
-  padding: 15px;
-  border-bottom: 1px solid #eee;
+  padding: 20px;
+  border-bottom: 1px solid #e9ecef;
+  transition: background-color 0.2s;
+}
+
+.comments-list li:hover {
+  background-color: #f8f9fa;
 }
 
 .comments-list li:last-child {
@@ -140,35 +199,185 @@ textarea {
 .comment-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 5px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.comment-username {
+  font-weight: 600;
+  color: #2c3e50;
 }
 
 .date {
-  font-size: 0.9em;
-  color: #777;
+  font-size: 0.875rem;
+  color: #6c757d;
 }
 
 .users-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .users-table th, 
 .users-table td {
-  padding: 10px;
+  padding: 15px;
   text-align: left;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #e9ecef;
 }
 
 .users-table th {
-  background-color: #f2f2f2;
+  background-color: #f1f3f5;
+  font-weight: 600;
+  color: #495057;
+  position: sticky;
+  top: 0;
+}
+
+.users-table tr:last-child td {
+  border-bottom: none;
+}
+
+.users-table tr:hover {
+  background-color: #f8f9fb;
 }
 
 .actions {
   display: flex;
-  gap: 5px;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .inline-form {
   display: inline-block;
+}
+
+/* Champ de nombre pour réduire le temps de session */
+input[type="number"] {
+  width: 60px;
+  text-align: center;
+  padding: 6px;
+  border-radius: 4px;
+  margin-right: 5px;
+}
+
+/* Tableaux avec défilement horizontal sur mobile */
+@media (max-width: 768px) {
+  .users-table-container {
+    overflow-x: auto;
+    margin-bottom: 20px;
+  }
+  
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .header .session-timer {
+    order: 2;
+  }
+  
+  .header a.btn {
+    align-self: flex-start;
+  }
+  
+  .actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Styles pour les badges de statut */
+.badge {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.badge-success {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.badge-danger {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Amélioration pour les groupes de formulaires d'actions */
+.time-reduce-group {
+  display: flex;
+  align-items: center;
+}
+
+/* Styles pour les badges de statut */
+.badge {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.badge-success {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.badge-danger {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Amélioration pour les groupes de formulaires d'actions */
+.time-reduce-group {
+  display: flex;
+  align-items: center;
+}
+
+/* Styles pour la page des commentaires */
+.empty-state {
+  text-align: center;
+  padding: 30px 0;
+  color: #6c757d;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  opacity: 0.6;
+}
+
+.comment-username {
+  font-weight: 600;
+  color: #2c3e50;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.comment-content {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+/* Amélioration pour les icônes dans le texte */
+i.fas {
+  margin-right: 5px;
+}
+
+.date i.fas {
+  opacity: 0.7;
+  font-size: 0.8rem;
 }
