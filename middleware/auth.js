@@ -14,8 +14,8 @@ const checkAuth = (req, res, next) => {
         }
       }
       
-      // Vérifier si l'utilisateur est blacklisté
-      if (req.session.user.blacklisted) {
+      // Vérifier si l'utilisateur est blacklisté (sauf pour les admins)
+      if (!req.session.user.isAdmin && req.session.user.blacklisted) {
         // Supprimer l'utilisateur de global.activeUsers s'il est blacklisté
         if (global.activeUsers && global.activeUsers[req.session.user.id.toString()]) {
           delete global.activeUsers[req.session.user.id.toString()];

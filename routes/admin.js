@@ -5,6 +5,11 @@ const Comment = require('../models/Comment');
 
 router.get('/dashboard', async (req, res) => {
   try {
+    // Vérifier si l'utilisateur est admin
+    if (!req.session.user || !req.session.user.isAdmin) {
+      return res.status(403).render('error', { message: 'Accès refusé' });
+    }
+
     // Récupérer tous les utilisateurs (sauf admins)
     const users = await User.find({ isAdmin: false });
     
@@ -56,6 +61,14 @@ router.post('/blacklist/:id', async (req, res) => {
         });
         return;
       }
+    } else {
+      // Si l'utilisateur est débloqué, on le réintègre dans global.activeUsers
+      if (!global.activeUsers) {
+        global.activeUsers = {};
+      }
+      global.activeUsers[user._id.toString()] = {
+        sessionExpiry: user.sessionExpiry ? user.sessionExpiry.getTime() : null
+      };
     }
     
     res.redirect('/admin/dashboard');
