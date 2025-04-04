@@ -12,9 +12,17 @@ router.post('/comment', async (req, res) => {
 
     const { content } = req.body;
     
-    // Rafraîchir la session avant de sauvegarder le commentaire
-    req.session.touch();
-    await req.session.save();
+    // Si c'est un admin, pas besoin de vérifier l'expiration
+    if (!req.session.user.isAdmin) {
+      // Vérifier si la session n'a pas expiré
+      if (req.session.user.sessionExpiry && new Date(req.session.user.sessionExpiry) < new Date()) {
+        req.session.destroy((err) => {
+          if (err) console.error('Erreur lors de la destruction de la session:', err);
+          return res.redirect('/?expired=true');
+        });
+        return;
+      }
+    }
     
     const newComment = new Comment({
       content,
@@ -23,14 +31,16 @@ router.post('/comment', async (req, res) => {
     
     await newComment.save();
     
-    // Rafraîchir à nouveau la session après la sauvegarde
-    req.session.touch();
-    await req.session.save();
+    // Pour les non-admins, on rafraîchit le temps de session
+    if (!req.session.user.isAdmin) {
+      req.session.touch();
+      await req.session.save();
+    }
     
-    res.redirect('/user/dashboard');
+    res.redirect(req.session.user.isAdmin ? '/admin/dashboard' : '/user/dashboard');
   } catch (err) {
     console.error('Erreur lors de la publication du commentaire:', err);
-    res.redirect('/user/dashboard?error=true');
+    res.redirect(req.session.user.isAdmin ? '/admin/dashboard' : '/user/dashboard');
   }
 });
 

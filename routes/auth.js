@@ -36,7 +36,7 @@ router.post('/login', async (req, res) => {
     }
 
     // Définir l'expiration de la session uniquement pour les utilisateurs non-admin
-    const expiryTime = user.isAdmin ? null : Date.now() + (60 * 60 * 1000); // 1 heure pour les non-admins, null pour les admins
+    const expiryTime = user.isAdmin ? null : Date.now() + (60 * 60 * 1000); // 1 heure pour les non-admins, pas d'expiration pour les admins
 
     // Stocker les informations utilisateur dans la session
     req.session.user = {
@@ -54,6 +54,17 @@ router.post('/login', async (req, res) => {
     user.lastLogin = new Date();
     user.sessionExpiry = expiryTime; // null pour les admins
     await user.save();
+
+    // S'assurer que la session est sauvegardée avant la redirection
+    await new Promise((resolve, reject) => {
+      req.session.save((err) => {
+        if (err) {
+          console.error('Erreur lors de la sauvegarde de la session:', err);
+          reject(err);
+        }
+        resolve();
+      });
+    });
 
     if (user.isAdmin) {
       console.log('Redirection vers le dashboard admin');

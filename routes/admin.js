@@ -4,14 +4,8 @@ const User = require('../models/User');
 const Comment = require('../models/Comment');
 const Notification = require('../models/Notification');
 
-
 router.get('/dashboard', async (req, res) => {
   try {
-    // Vérifier si l'utilisateur est admin
-    if (!req.session.user || !req.session.user.isAdmin) {
-      return res.status(403).render('error', { message: 'Accès refusé' });
-    }
-
     // Récupérer tous les utilisateurs (sauf admins)
     const users = await User.find({ isAdmin: false });
     

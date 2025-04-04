@@ -28,20 +28,31 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Configuration de la session avant toute autre route
 app.use(session({
   secret: 'secret_key',
-  resave: true,
+  resave: false,
   saveUninitialized: false,
   store: MongoStore.create({ 
     mongoUrl: 'mongodb://localhost:27017/loginApp',
-    ttl: 24 * 60 * 60 // 24 heures
+    ttl: 30 * 24 * 60 * 60, // 30 jours
+    autoRemove: 'native',
+    touchAfter: 24 * 3600 // Rafraîchir la session une fois par jour
   }),
   cookie: { 
-    maxAge: 24 * 60 * 60 * 1000, // 24 heures
-    secure: false, // Mettre à true en production avec HTTPS
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 jours
+    secure: false,
     httpOnly: true
   }
 }));
+
+// Middleware pour vérifier la session à chaque requête
+app.use((req, res, next) => {
+  console.log('Session actuelle:', req.session);
+  console.log('Utilisateur actuel:', req.session.user);
+  next();
+});
 
 // Configuration des vues
 app.set('view engine', 'ejs');
