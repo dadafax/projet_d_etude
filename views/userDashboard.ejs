@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau de bord - Utilisateur</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="user-container">
+  <div class="container">
+    <div class="header">
+      <h1><i class="fas fa-user-circle"></i> Bienvenue, <%= user.username %></h1>
+      <div class="session-timer">
+        <i class="fas fa-clock"></i> Temps restant: <span id="timer"><%= Math.floor(timeLeft / 60) %>:<%= (timeLeft % 60).toString().padStart(2, '0') %></span>
+      </div>
+      <a href="/logout" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+    </div>
+    
+    <div class="content">
+      <h2><i class="fas fa-comments"></i> Système de commentaires</h2>
+      
+      <form action="/user/comment" method="POST" class="comment-form">
+        <div class="form-group">
+          <label for="content">Nouveau commentaire</label>
+          <textarea id="content" name="content" required placeholder="Partagez vos pensées..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Publier</button>
+      </form>
+    </div>
+  </div>
+  
+  <script>
+    // Timer pour le temps de session restant
+    let timeLeft = <%= timeLeft %>;
+    const timerElement = document.getElementById('timer');
+    
+    const updateTimer = () => {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      
+      if (timeLeft <= 0) {
+        window.location.href = '/logout';
+      } else {
+        timeLeft--;
+        setTimeout(updateTimer, 1000);
+      }
+    };
+    
+    updateTimer();
+  </script>
+</body>
+</html>
